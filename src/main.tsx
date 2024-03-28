@@ -10,7 +10,7 @@ import {
   useNavigationType,
 } from 'react-router-dom'
 
-import App from './App.tsx'
+import Home from './home'
 
 Sentry.init({
   dsn: 'https://fda683fb1ebdd3be7fb4a039087ec781@o4506979620683776.ingest.us.sentry.io/4506979624812544',
@@ -37,6 +37,6 @@ Sentry.init({
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
+    <Home />
   </React.StrictMode>,
 )
