@@ -1,15 +1,22 @@
 import { useGLTF, useTexture } from '@react-three/drei'
 import { GroupProps } from '@react-three/fiber'
-import { useEffect } from 'react'
-import * as THREE from 'three'
+import { memo } from 'react'
+import type {
+  BufferGeometry,
+  Material,
+  Object3D,
+  Object3DEventMap,
+  Texture,
+} from 'three'
+import { Color } from 'three'
 
 type Materials = {
-  [name: string]: THREE.Material & { color: THREE.Color }
+  [name: string]: Material & { color: Color }
 }
 
 type Nodes = {
-  [name: string]: THREE.Object3D<THREE.Object3DEventMap> & {
-    geometry: THREE.BufferGeometry
+  [name: string]: Object3D<Object3DEventMap> & {
+    geometry: BufferGeometry
   }
 }
 
@@ -21,27 +28,24 @@ type ModelProps = GroupProps & {
   }
 }
 
-function Model(props: ModelProps) {
+function Component({ item, ...props }: ModelProps) {
   const { nodes, materials } = useGLTF('/models/scene.glb')
-  const materialsFormatted = Object.entries(materials as Materials)
+  const texture = useTexture(item.image)
+
   const nodesFormatted = nodes as Nodes
 
-  const texture = useTexture(props.item.image)
-
-  useEffect(() => {
-    materialsFormatted.map((material) => {
-      if (
-        material[0] !== 'zFdeDaGNRwzccye' &&
-        material[0] !== 'ujsvqBWRMnqdwPx' &&
-        material[0] !== 'hUlRcbieVuIiOXG' &&
-        material[0] !== 'jlzuBkUzuJqgiAK' &&
-        material[0] !== 'xNrofRCqOXXHVZt'
-      ) {
-        return (material[1].color = new THREE.Color(props.item.colors[0]))
-      }
-      return (material[1].needsUpdate = true)
-    })
-  }, [materials, materialsFormatted, props.item])
+  Object.entries(materials as Materials).forEach((material) => {
+    if (
+      material[0] !== 'zFdeDaGNRwzccye' &&
+      material[0] !== 'ujsvqBWRMnqdwPx' &&
+      material[0] !== 'hUlRcbieVuIiOXG' &&
+      material[0] !== 'jlzuBkUzuJqgiAK' &&
+      material[0] !== 'xNrofRCqOXXHVZt'
+    ) {
+      material[1].color = new Color(item.colors[0])
+    }
+    material[1].needsUpdate = true
+  })
 
   return (
     <group {...props} dispose={null}>
@@ -157,7 +161,7 @@ function Model(props: ModelProps) {
         material={materials.pIJKfZsazmcpEiU}
         scale={0.01}
       >
-        <meshStandardMaterial roughness={1} map={texture as THREE.Texture} />
+        <meshStandardMaterial roughness={1} map={texture as Texture} />
       </mesh>
       <mesh
         castShadow
@@ -268,6 +272,6 @@ function Model(props: ModelProps) {
   )
 }
 
-export default Model
+const IPhoneModel = memo(Component)
 
-useGLTF.preload('/models/scene.glb')
+export default IPhoneModel

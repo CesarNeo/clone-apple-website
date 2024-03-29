@@ -1,7 +1,7 @@
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/all'
-import { ElementRef, useEffect, useRef, useState } from 'react'
+import { ElementRef, useCallback, useEffect, useRef, useState } from 'react'
 
 import { cn, videoWidth } from '../utils'
 import { HIGHLIGHTS_SLIDES } from '../utils/constants'
@@ -51,7 +51,7 @@ const VideoCarousel = () => {
       ? '/assets/images/play.svg'
       : '/assets/images/pause.svg'
 
-  function handleProcess(type: string, i?: number) {
+  const handleProcess = useCallback((type: string, i?: number) => {
     switch (type) {
       case 'video-end':
         setVideo((pre) => ({ ...pre, isEnd: true, videoId: i! + 1 }))
@@ -71,31 +71,27 @@ const VideoCarousel = () => {
       default:
         break
     }
-  }
+  }, [])
 
-  function handleVideoControlClick() {
-    if (isLast) {
-      return handleProcess('video-reset')
-    }
+  const handleVideoControlClick = useCallback(() => {
+    if (isLast) return handleProcess('video-reset')
 
-    if (isPlaying) {
-      return handleProcess('play')
-    }
+    if (isPlaying) return handleProcess('play')
 
     return handleProcess('pause')
-  }
+  }, [handleProcess, isLast, isPlaying])
 
-  function handleVideoEnded(videoIndex: number) {
-    if (videoIndex !== 3) {
-      return handleProcess('video-end', videoIndex)
-    }
+  const handleVideoEnded = useCallback(
+    (videoIndex: number) => {
+      if (videoIndex !== 3) return handleProcess('video-end', videoIndex)
 
-    handleProcess('video-last')
-  }
-
-  function handleVideoPlay() {
+      handleProcess('video-last')
+    },
+    [handleProcess],
+  )
+  const handleVideoPlay = useCallback(() => {
     setVideo((pre) => ({ ...pre, isPlaying: true }))
-  }
+  }, [])
 
   useEffect(() => {
     let currentProgress = 0
